@@ -12,4 +12,13 @@
     tools:context="com.example.davidschicaiza.myapplication.UDPActivity"
     tools:showIn="@layout/activity_udp">
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+        android:id="@+id/btnStopUDP"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="110dp"
+        android:onClick="stop"/>
+
 </RelativeLayout>

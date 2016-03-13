@@ -86,7 +86,6 @@ public class act extends AppCompatActivity
     public void sendUDP(View view) {
         Log.i("UDP button", "Button clicked");
 
-
         Intent intent = new Intent(this, UDPActivity.class);
         startActivity(intent);
     }

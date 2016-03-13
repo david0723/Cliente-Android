@@ -1,6 +1,7 @@
 package com.example.davidschicaiza.myapplication;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,6 +21,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import android.os.SystemClock;
 
 public class TCPActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -34,6 +36,9 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
     public static double speed;
     public static double latitude;
     public static double longitude;
+
+    private static boolean send;
+    private static int id;
 
 
     @Override
@@ -57,27 +62,36 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
                 .setInterval(1000);
 
         //TCP
-        new Thread(new Runnable()
-        {
-            public void run()
-            {
+        send = true;
+        id = 0;
+        new Thread(new Runnable() {
+            public void run() {
 
                 Log.i("TCP button", "New TCP client");
-                try
-                {
-                    //TODO Ver como se le envian los datos cada segundo al TCPClient
+                try {
                     TCPClient tcp = new TCPClient();
-                    tcp.exe();
-                    Log.i("TCP button", "Try execute");
+                    while(send){
+                        tcp.send(id + "," + latitude + "," + longitude + "," + altitude + "," + speed);
+                        id++;
+                        SystemClock.sleep(1000);
+                    }
+                    tcp.close();
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
 
 
+    }
+
+    public void stop(View view){
+        send = false;
+        id = 0;
+        Log.i("TCP Stop button", "Button clicked");
+        Intent intent = new Intent(this, act.class);
+        startActivity(intent);
     }
 
     //TODO Ver si hay que hacer algo con el thread aqui
