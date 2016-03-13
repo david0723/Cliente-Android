@@ -79,50 +79,16 @@ public class act extends AppCompatActivity
     public void sendTCP(View view) {
         Log.i("TCP button", "Button clicked");
 
-        Intent intent = new Intent(this, LocationActivity.class);
+        Intent intent = new Intent(this, TCPActivity.class);
         startActivity(intent);
-
-//        new Thread(new Runnable()
-//        {
-//            public void run()
-//            {
-//
-//                Log.i("TCP button", "New TCP client");
-//                try
-//                {
-//                    TCPClient tcp = new TCPClient();
-//                    tcp.exe();
-//                    Log.i("TCP button", "Try execute");
-//                }
-//                catch (Exception e)
-//                {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
     }
 
     public void sendUDP(View view) {
         Log.i("UDP button", "Button clicked");
 
-//        new Thread(new Runnable()
-//        {
-//            public void run()
-//            {
-//
-//                Log.i("UDP button", "New UDP client");
-//                try
-//                {
-//                    UDPClient udp = new UDPClient();
-//                    udp.exe();
-//                    Log.i("UDP button", "Try execute");
-//                }
-//                catch (Exception e)
-//                {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
+
+        Intent intent = new Intent(this, UDPActivity.class);
+        startActivity(intent);
     }
 
     @Override
