@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="action_settings">Settings</string>
-    <string name="btnSend">send</string>
+    <string name="title_activity_tcp">Sending via TCP</string>
+    <string name="title_activity_udp">Sending via UDP</string>
 </resources>

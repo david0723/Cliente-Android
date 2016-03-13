@@ -24,7 +24,7 @@ class UDPClient
         //clientSocket.bind(add);
 
         DatagramSocket clientSocket = new DatagramSocket();
-        InetAddress direccion = InetAddress.getByName("157.253.217.94");
+        InetAddress direccion = InetAddress.getByName("192.168.0.4");
 
         String mensaje = "Hola";
         int longitud = mensaje.length();
