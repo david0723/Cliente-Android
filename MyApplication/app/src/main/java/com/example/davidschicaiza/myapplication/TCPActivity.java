@@ -26,9 +26,9 @@ import android.os.SystemClock;
 public class TCPActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
-    public static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 2301;
-    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 2302;
-    public static final String TAG = LocationActivity.class.getSimpleName();
+    public static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 253;
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 254;
+    public static final String TAG = TCPActivity.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
@@ -55,7 +55,6 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
-                .addApi(ActivityRecognition.API)
                 .build();
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -75,7 +74,7 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
                         id++;
                         Log.i("TCP Thread", "Message sent");
                         //TODO Este sleep esta dañando todo
-//                        SystemClock.sleep(1000);
+                        SystemClock.sleep(1000);
                     }
                     tcp.close();
                 }
@@ -96,6 +95,19 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
         startActivity(intent);
     }
 
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        if (!mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.connect();
+//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                        TCPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
+//            }
+//            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+//        }
+//    }
+
     //TODO Ver si hay que hacer algo con el thread aqui
     @Override
     protected void onPause() {
@@ -114,7 +126,7 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
             mGoogleApiClient.connect();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        LocationActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
+                        TCPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
             }
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
@@ -136,7 +148,7 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
         Log.i(TAG, "Location & Activity services connected.");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LocationActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
+                    TCPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);

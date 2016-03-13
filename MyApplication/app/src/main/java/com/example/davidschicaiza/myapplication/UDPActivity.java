@@ -28,7 +28,7 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
 
     public static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 2301;
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 2302;
-    public static final String TAG = LocationActivity.class.getSimpleName();
+    public static final String TAG = UDPActivity.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
@@ -110,7 +110,7 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
             mGoogleApiClient.connect();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        LocationActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
+                        UDPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
             }
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
@@ -132,7 +132,7 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
         Log.i(TAG, "Location & Activity services connected.");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LocationActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
+                    UDPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
