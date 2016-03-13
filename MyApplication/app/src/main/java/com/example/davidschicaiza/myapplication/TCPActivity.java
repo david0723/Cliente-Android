@@ -67,13 +67,15 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
         new Thread(new Runnable() {
             public void run() {
 
-                Log.i("TCP button", "New TCP client");
+                Log.i("TCP Thread", "New TCP client");
                 try {
                     TCPClient tcp = new TCPClient();
                     while(send){
                         tcp.send(id + "," + latitude + "," + longitude + "," + altitude + "," + speed);
                         id++;
-                        SystemClock.sleep(1000);
+                        Log.i("TCP Thread", "Message sent");
+                        //TODO Este sleep esta dañando todo
+//                        SystemClock.sleep(1000);
                     }
                     tcp.close();
                 }
