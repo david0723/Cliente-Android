@@ -55,11 +55,40 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
-                .addApi(ActivityRecognition.API)
                 .build();
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(1000);
+    }
+
+    public void stop(View view){
+        send = false;
+        id = 0;
+        Log.i("UDP Stop button", "Button clicked");
+        Intent intent = new Intent(this, act.class);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(TAG, "Location & Activity services connected.");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    UDPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if(lastLocation!=null) {
+            handleNewLocation(lastLocation);
+        }
 
         //UDP
         send = true;
@@ -73,6 +102,7 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
                     while(send){
                         udp.send(id + "," + latitude + "," + longitude + "," + altitude + "," + speed);
                         id++;
+                        Log.i("UDP Thread", "Message sent");
                         SystemClock.sleep(1000);
                     }
                     udp.close();
@@ -84,69 +114,12 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
         }).start();
     }
 
-    public void stop(View view){
-        send = false;
-        id = 0;
-        Log.i("UDP Stop button", "Button clicked");
-        Intent intent = new Intent(this, act.class);
-        startActivity(intent);
-    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
-    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        UDPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
-            }
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
-    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i(TAG, "Location & Activity services connected.");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    UDPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        handleNewLocation(lastLocation);
-    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
     @Override
     public void onConnectionSuspended(int i) {
         Log.i(TAG, "Location services suspended. Trying to reconnect.");
         mGoogleApiClient.connect();
     }
 
-    //TODO Ver si hay que hacer algo con el thread aqui
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         if (connectionResult.hasResolution()) {
@@ -160,13 +133,11 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
         }
     }
 
-    //Listo
     @Override
     public void onLocationChanged(Location location) {
         handleNewLocation(location);
     }
 
-    //Listo
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
         latitude = location.getLatitude();

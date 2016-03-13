@@ -43,6 +43,7 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         //Interfaz
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tcp);
@@ -59,6 +60,36 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(1000);
+    }
+
+    public void stop(View view){
+        send = false;
+        id = 0;
+        Log.i("TCP Stop button", "Button clicked");
+        Intent intent = new Intent(this, act.class);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(TAG, "Location & Activity services connected.");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    TCPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if(lastLocation!=null) {
+            handleNewLocation(lastLocation);
+        }
 
         //TCP
         send = true;
@@ -73,7 +104,6 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
                         tcp.send(id + "," + latitude + "," + longitude + "," + altitude + "," + speed);
                         id++;
                         Log.i("TCP Thread", "Message sent");
-                        //TODO Este sleep esta dañando todo
                         SystemClock.sleep(1000);
                     }
                     tcp.close();
@@ -83,86 +113,14 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
                 }
             }
         }).start();
-
-
     }
 
-    public void stop(View view){
-        send = false;
-        id = 0;
-        Log.i("TCP Stop button", "Button clicked");
-        Intent intent = new Intent(this, act.class);
-        startActivity(intent);
-    }
-
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        if (!mGoogleApiClient.isConnected()) {
-//            mGoogleApiClient.connect();
-//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-//                        TCPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
-//            }
-//            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-//        }
-//    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
-    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        TCPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
-            }
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
-    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i(TAG, "Location & Activity services connected.");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    TCPActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        handleNewLocation(lastLocation);
-    }
-
-    //TODO Ver si hay que hacer algo con el thread aqui
     @Override
     public void onConnectionSuspended(int i) {
         Log.i(TAG, "Location services suspended. Trying to reconnect.");
         mGoogleApiClient.connect();
     }
 
-    //TODO Ver si hay que hacer algo con el thread aqui
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         if (connectionResult.hasResolution()) {
@@ -176,13 +134,11 @@ public class TCPActivity extends AppCompatActivity implements GoogleApiClient.Co
         }
     }
 
-    //Listo
     @Override
     public void onLocationChanged(Location location) {
         handleNewLocation(location);
     }
 
-    //Listo
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
         latitude = location.getLatitude();
