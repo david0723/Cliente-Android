@@ -30,6 +30,10 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
+    public static double altitude;
+    public static double speed;
+    public static double latitude;
+    public static double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +54,7 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
                 .build();
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(1000)
-                .setFastestInterval(16)
-                .setSmallestDisplacement(5);
+                .setInterval(1000);
 
         //UDP
         new Thread(new Runnable()
@@ -119,6 +121,8 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
                     LocationActivity.MY_PERMISSION_ACCESS_COARSE_LOCATION);
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        handleNewLocation(lastLocation);
     }
 
     //TODO Ver si hay que hacer algo con el thread aqui
@@ -151,9 +155,10 @@ public class UDPActivity extends AppCompatActivity implements GoogleApiClient.Co
     //Listo
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
-        double currentLatitude = location.getLatitude();
-        double currentLongitude = location.getLongitude();
-        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        altitude = location.getAltitude();
+        speed = location.getSpeed();
     }
 
 }
